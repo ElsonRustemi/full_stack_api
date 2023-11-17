@@ -8,10 +8,15 @@ import {
   Delete,
   UsePipes,
   ValidationPipe,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  Req,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { Request } from 'express';
+import { User } from 'src/auth/entities/user.entity';
 
 @Controller('task')
 export class TaskController {
@@ -19,11 +24,12 @@ export class TaskController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(createTaskDto);
+  create(@Body() createTaskDto: CreateTaskDto, @Req() req: Request) {
+    return this.taskService.create(createTaskDto, req.user as User);
   }
 
   @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
   findAll() {
     return this.taskService.findAll();
   }
